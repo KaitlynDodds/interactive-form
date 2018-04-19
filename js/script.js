@@ -3,6 +3,9 @@
 ******************/ 
 const otherTitleInput = document.getElementById('other-title');
 const colorSelect = document.getElementById('color');
+const creditCardPaymentDiv = document.getElementById('credit-card');
+const paypalPaymentDiv = creditCardPaymentDiv.nextElementSibling;
+const bitcoinPaymentDiv = paypalPaymentDiv.nextElementSibling;
 
 const registration = {
 	name: () => { return document.getElementById('name').value },
@@ -150,6 +153,41 @@ document.querySelector('.activities').addEventListener('change', (e) => {
 		console.log(registration.activities.activities);
 
 	}
+});
+
+
+/* Payment Info
+********************/ 
+
+// hide all payment options 
+function hideAllPaymentOptions() {
+	creditCardPaymentDiv.style.display = 'none';
+	paypalPaymentDiv.style.display = 'none';
+	bitcoinPaymentDiv.style.display = 'none';
+}
+
+hideAllPaymentOptions();
+
+//respond to change events on payment options select
+document.getElementById('payment').addEventListener('change', (e) => {
+
+	if (e.target.value === 'credit card') {
+		// hide all payment divs
+		hideAllPaymentOptions();
+		// show credit card payment div
+		creditCardPaymentDiv.style.display = '';
+	} else if (e.target.value === 'paypal') {
+		// hide all payment divs
+		hideAllPaymentOptions();
+		// show paypal payment div
+		paypalPaymentDiv.style.display = '';		
+	} else if (e.target.value === 'bitcoin') {
+		// hide all payment divs
+		hideAllPaymentOptions();
+		// show bitcoin payment div
+		bitcoinPaymentDiv.style.display = '';
+	}
+
 });
 
 

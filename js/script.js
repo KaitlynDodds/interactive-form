@@ -14,6 +14,10 @@ const registration = {
 		size: () => { return document.getElementById('size').value },
 		design: () => { return document.getElementById('design').value },
 		color: () => { return document.getElementById('color').value }
+	},
+	activities: {
+		total: 0,
+		activities: []
 	}
 };
 
@@ -73,5 +77,101 @@ document.getElementById('design').addEventListener('change', (e) => {
 	}
 
 });
+
+
+/* Register for Activities
+***************************/ 
+
+document.querySelector('.activities').addEventListener('change', (e) => {
+
+	function toggleConflictingEvents(label, conflict) {
+		const labels = document.querySelector('.activities').querySelectorAll('label');
+		// loop over all activity labels 
+		for (let i = 0; i < labels.length; i++) {
+			// isolate timeslot for activity
+			const labelTimeslot = labels[i].querySelector('.timeslot');
+			// check if timeslot is the same as conflict
+			if (labelTimeslot && 
+				labelTimeslot.textContent.trim() === conflict) {
+				// timeslot conflicts
+				console.log(labels[i].querySelector('input').disabled);
+				if (labels[i] !== label) {
+					// disable checkbox
+					labels[i].querySelector('input').disabled = true;
+					labels[i].style.color = "lightgrey";
+				} else {
+					// enabled checkbox
+					labels[i].querySelector('input').disabled = false;
+					labels[i].style.color = 'red';	
+				}
+				
+			} 
+		}
+	}
+
+	
+	if (e.target.type === 'checkbox') {
+		const label = e.target.parentNode;	
+		const activities = registration.activities.activities;
+
+		const price = label.querySelector('.price');
+		const timeslot = label.querySelector('.timeslot');
+		const activity = (label.textContent.split(' — '))[0].trim();
+		// event info object
+		const eventObj = {
+			time: (timeslot ? timeslot.textContent : null),
+			price: (price ? parseInt(price.textContent) : null),
+			event: (activity ? activity : null)
+		}
+		
+
+		if (e.target.checked) {
+			// add event info to activities arr 
+			activities.push(eventObj);
+
+			// disable conflicting events 
+			if (timeslot) {
+				toggleConflictingEvents(label, timeslot.textContent.trim());
+			}
+
+		} else {
+			// remove event info from activities arr 
+			for (let i = 0; i < activities.length; i++) {
+				if (eventObj.activity === activities[i].activity && 
+					eventObj.time === activities[i].time)
+					// events match, remove from activities arr
+					activities.splice(i, 1);
+
+					// remove disabled styling from all related events 
+					toggleConflictingEvents(label, eventObj.timeslot);
+			}
+		}
+
+		console.log(registration.activities.activities);
+
+	}
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

@@ -6,6 +6,7 @@ const colorSelect = document.getElementById('color');
 const creditCardPaymentDiv = document.getElementById('credit-card');
 const paypalPaymentDiv = creditCardPaymentDiv.nextElementSibling;
 const bitcoinPaymentDiv = paypalPaymentDiv.nextElementSibling;
+const paymentSelect = document.getElementById('payment');
 
 const registration = {
 	name: () => { return document.getElementById('name').value },
@@ -33,6 +34,11 @@ document.getElementById('name').focus();
 
 // hide other input for job role section
 otherTitleInput.style.display = 'none';
+
+// select credit card payment by default 
+paymentSelect.value = 'credit card';
+hideAllPaymentOptions();
+creditCardPaymentDiv.style.display = '';
 
 
 /* Job Role 
@@ -166,10 +172,8 @@ function hideAllPaymentOptions() {
 	bitcoinPaymentDiv.style.display = 'none';
 }
 
-hideAllPaymentOptions();
-
 //respond to change events on payment options select
-document.getElementById('payment').addEventListener('change', (e) => {
+paymentSelect.addEventListener('change', (e) => {
 
 	if (e.target.value === 'credit card') {
 		// hide all payment divs
@@ -186,9 +190,14 @@ document.getElementById('payment').addEventListener('change', (e) => {
 		hideAllPaymentOptions();
 		// show bitcoin payment div
 		bitcoinPaymentDiv.style.display = '';
+	} else {
+		// hide all payment divs
+		hideAllPaymentOptions();
 	}
 
 });
+
+
 
 
 

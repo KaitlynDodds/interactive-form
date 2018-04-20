@@ -6,6 +6,7 @@ const emailInput = document.getElementById('mail');
 
 const otherTitleInput = document.getElementById('other-title');
 
+const colorSelectDiv = document.getElementById('colors-js-puns');
 const colorSelect = document.getElementById('color');
 const activitiesFieldset = document.querySelector('.activities');
 const paymentSelect = document.getElementById('payment');
@@ -47,13 +48,28 @@ const creditCardPaymentObj = {
 document.getElementById('name').focus();
 
 // hide other input for job role section
-otherTitleInput.style.display = 'none';
+hide(otherTitleInput);
 
 // select credit card payment by default 
 hideAllPaymentOptions();
 paymentSelect.value = 'credit card';
-creditCardPaymentDiv.style.display = '';
+show(creditCardPaymentDiv);
 registration.payment = creditCardPaymentObj;
+
+// hide color label and select 
+hide(colorSelectDiv);
+
+
+/* Helper Functions
+*********************/
+
+function hide(element) {
+	element.style.display = 'none';
+}
+
+function show(element) {
+	element.style.display = '';
+}
 
 
 /* Job Role 
@@ -93,11 +109,17 @@ document.getElementById('design').addEventListener('change', (e) => {
 	const heartJSColors = ['tomato', 'steelblue', 'dimgrey'];
 
 	if (theme === 'js puns') {
+		// show color menu
+		show(colorSelectDiv);
 		// display "Cornflower Blue," "Dark Slate Grey," and "Gold."
 		toggleVisibility(jsPunsColors);
 	} else if (theme === 'heart js') {
+		// show color menu
+		show(colorSelectDiv);
 		// display "Tomato," "Steel Blue," and "Dim Grey."
 		toggleVisibility(heartJSColors);
+	} else {
+		hide(colorSelectDiv);
 	}
 
 });
@@ -196,14 +218,6 @@ function setPaymentType(paymentType) {
 	registration.payment = {
 		type: paymentType
 	}
-}
-
-function hide(element) {
-	element.style.display = 'none';
-}
-
-function show(element) {
-	element.style.display = '';
 }
 
 //respond to change events on payment options select

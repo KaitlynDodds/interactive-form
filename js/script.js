@@ -15,6 +15,7 @@ const creditCardPaymentDiv = document.getElementById('credit-card');
 const paypalPaymentDiv = creditCardPaymentDiv.nextElementSibling;
 const bitcoinPaymentDiv = paypalPaymentDiv.nextElementSibling;
 
+const registerBtn = document.querySelector('button');
 
 const registration = {
 	name: () => { return nameInput.value },
@@ -309,32 +310,66 @@ function removeAllErrorStyling() {
 	}
 }
 
-document.querySelector('button').addEventListener('click', (e) => {
+function displayErrorMessages(errorMsgs) {
+	const errorMessageDiv = document.createElement('div');
+	errorMessageDiv.className = 'error-list';
+	const errorMessageUL = document.createElement('ul');
+
+	for (let i = 0; i < errorMsgs.length; i++) {
+		let li = document.createElement('li');
+		li.textContent = errorMsgs[i];
+		errorMessageUL.appendChild(li);
+	}
+
+	errorMessageDiv.appendChild(errorMessageUL);
+	const parent = registerBtn.parentNode;
+	parent.insertBefore(errorMessageDiv, registerBtn.nextElementSibling);
+}
+
+function removeErrorMessages() {
+	const errorMessageDiv = registerBtn.nextElementSibling;
+	if (errorMessageDiv) {
+		const parent = errorMessageDiv.parentNode;
+		parent.removeChild(errorMessageDiv);
+	}
+}
+
+registerBtn.addEventListener('click', (e) => {
 	// stop page reload
 	e.preventDefault();
 
 	if (e.target.type === 'submit') {
 
 		removeAllErrorStyling();
+		removeErrorMessages();
+		const errorMsgs = [];
 		
 		// Name field can't be blank
 		if (registration.name().length === 0) {
-			displayInputError(nameInput, '(please provide a valid email)');
+			displayInputError(nameInput, '(please provide a name)');
+			errorMsgs.push('Please provide a name');
 		}
 
 		// Email field must be a validly formatted e-mail address (you don't have to check that it's a real e-mail address, just that it's formatted like one: dave@teamtreehouse.com for example.
-		if (!isEmail(registration.email())) {
-			displayInputError(emailInput, '(please provide a name)');
+		if (registration.email().length === 0) {
+			displayInputError(emailInput, '(please provide an email address)');
+			errorMsgs.push('Please provide an email address.');
+		}
+		else if (!isEmail(registration.email())) {
+			displayInputError(emailInput, '(please provide a valid email address)');
+			errorMsgs.push('Please provide a valid email address.');
 		}
 
 		// t-shirt theme must be selected 
 		if (registration.tshirt.design() === 'Select Theme') {
 			displayFieldsetError(document.querySelector('fieldset.shirt legend'), 'Don\'t forget to pick a T-Shirt');
+			errorMsgs.push('Don\'t forget to pick a T-Shirt.');
 		}
 
 		// Must select at least one checkbox under the "Register for Activities" section of the form.
 		if (registration.activities.activities.length === 0) {
 			displayFieldsetError(document.querySelector('fieldset.activities legend'), 'Please select an Activity');
+			errorMsgs.push('Please select an Activity.');
 		}
 
 		if (registration.payment.type !== 'select_method') {
@@ -342,25 +377,43 @@ document.querySelector('button').addEventListener('click', (e) => {
 			if (registration.payment.type === 'credit card') {
 				
 				// Credit card field should only accept a number between 13 and 16 digits
-				if (!(registration.payment.cardNumber().length >= 13 && 
+				if (registration.payment.cardNumber().length === 0) {
+					displayInputError(document.querySelector('#cc-num'));
+					errorMsgs.push('Please enter a credit card number.');
+				}
+				else if (!(registration.payment.cardNumber().length >= 13 && 
 					registration.payment.cardNumber().length <= 16)) {
 					displayInputError(document.querySelector('#cc-num'));
+					errorMsgs.push('Please enter a credit card number that is between 13 and 16 digits long.');
 				}
 
 				// The zipcode field should accept a 5-digit number
-				if (registration.payment.zipCode().length !== 5) {
+				if (registration.payment.zipCode().length === 0) {
 					displayInputError(document.querySelector('#zip'));
+					errorMsgs.push('Please provide a zipcode.');
+				}
+				else if (registration.payment.zipCode().length !== 5) {
+					displayInputError(document.querySelector('#zip'));
+					errorMsgs.push('Zipcode must be 5 digits');
 				}
 
 				// The CVV should only accept a number that is exactly 3 digits long
-				if (registration.payment.cvv().length !== 3) {
+				if (registration.payment.cvv().length === 0) {
 					displayInputError(document.querySelector('#cvv'));
+					errorMsgs.push('Please provide a cvv.');
+				}
+				else if (registration.payment.cvv().length !== 3) {
+					displayInputError(document.querySelector('#cvv'));
+					errorMsgs.push('CVV must be 3 digits');
 				}
 			}
 		} else {
 			// no payment option selected
 			displayFieldsetError(document.querySelector('fieldset.payment-info legend'), 'Please select a payment option');
+			errorMsgs.push('Please select a payment option');
 		}
+
+		displayErrorMessages(errorMsgs);
 
 	}
 

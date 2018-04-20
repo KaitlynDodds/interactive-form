@@ -1,16 +1,23 @@
 
 /* Const Elements
 ******************/ 
+const nameInput = document.getElementById('name');
+const emailInput = document.getElementById('mail');
+
 const otherTitleInput = document.getElementById('other-title');
+
 const colorSelect = document.getElementById('color');
+
+const paymentSelect = document.getElementById('payment');
+
 const creditCardPaymentDiv = document.getElementById('credit-card');
 const paypalPaymentDiv = creditCardPaymentDiv.nextElementSibling;
 const bitcoinPaymentDiv = paypalPaymentDiv.nextElementSibling;
-const paymentSelect = document.getElementById('payment');
+
 
 const registration = {
-	name: () => { return document.getElementById('name').value },
-	email: () => { return document.getElementById('mail').value },
+	name: () => { return nameInput.value },
+	email: () => { return emailInput.value },
 	title: () => {
 		return document.getElementById('title').value !== 'other' ? document.getElementById('title').value : document.getElementById('other_title').value;
 	},
@@ -230,51 +237,104 @@ function isEmail(email) {
     return re.test(email);
 }
 
+// adds error styling to input and related label
+function displayInputError(input, errMsg = '') {
+	input.className = 'br-error';
+	input.previousElementSibling.className = 'error';
+	input.previousElementSibling.insertAdjacentHTML('beforeend', `<span> ${errMsg}</span>`);
+}
+
+function removeInputError(input, msg = '') {
+	const label = input.previousElementSibling;
+
+	input.classList.remove('br-error');
+	label.classList.remove('error');
+
+	const span = label.querySelector('span');
+	label.removeChild(span);
+}
+
+// add error styling to fieldset legend
+function displayFieldsetError(legend, errMsg) {
+	legend.insertAdjacentHTML('beforeend', `<span class="error sm-error"><br>${errMsg}</span>`);
+}
+
+function removeFieldsetError(legend) {
+	const spanError = legend.querySelector('span');
+	legend.removeChild(spanError);
+}
+
+function removeAllErrorStyling() {
+	const errorElements = document.querySelectorAll('.error');
+	for (let i = 0; i < errorElements.length; i++) {
+		// remove error class from all
+		errorElements[i].classList.remove('error');
+
+		if (errorElements[i].tagName === 'LABEL') {
+			// remove input error styling
+			const input = errorElements[i].nextElementSibling;
+			removeInputError(input);
+		} else if (errorElements[i].tagName === 'SPAN') {
+			// remove fieldset error styling
+			const parent = errorElements[i].parentNode;
+			removeFieldsetError(parent);
+		}
+	}
+}
+
 document.querySelector('button').addEventListener('click', (e) => {
 	// stop page reload
 	e.preventDefault();
 
 	if (e.target.type === 'submit') {
+
+		removeAllErrorStyling();
 		
 		// Name field can't be blank
 		if (registration.name().length === 0) {
-			console.log('name is blank');
+			displayInputError(nameInput, '(please provide a valid email)');
 		}
 
 		// Email field must be a validly formatted e-mail address (you don't have to check that it's a real e-mail address, just that it's formatted like one: dave@teamtreehouse.com for example.
 		if (!isEmail(registration.email())) {
-			console.log('Invalid email');
+			displayInputError(emailInput, '(please provide a name)');
+		}
+
+		// t-shirt theme must be selected 
+		if (registration.tshirt.design() === 'Select Theme') {
+			displayFieldsetError(document.querySelector('fieldset.shirt legend'), 'Don\'t forget to pick a T-Shirt');
 		}
 
 		// Must select at least one checkbox under the "Register for Activities" section of the form.
 		if (registration.activities.activities.length === 0) {
-			console.log('Please select an activity.');
+			displayFieldsetError(document.querySelector('fieldset.activities legend'), 'Please select an Activity');
 		}
 
 		if (registration.payment.type !== 'select_method') {
 			// If the selected payment option is "Credit Card," make sure the user has supplied a credit card number, a zip code, and a 3 number CVV value before the form can be submitted.
 			if (registration.payment.type === 'credit card') {
+				
 				// Credit card field should only accept a number between 13 and 16 digits
 				if (registration.payment.cardNumber().length >= 13 && 
 					registration.payment.cardNumber().length <= 16) {
-					console.log('Credit card number is valid');
+					// FIXME: make this easier to understand
 				} else {
-					console.log('Credit card number is invalid');
+					displayInputError(document.querySelector('#cc-num'));
 				}
 
 				// The zipcode field should accept a 5-digit number
 				if (registration.payment.zipCode().length !== 5) {
-					console.log('zip code is invalid');
+					displayInputError(document.querySelector('#zip'));
 				}
 
 				// The CVV should only accept a number that is exactly 3 digits long
 				if (registration.payment.cvv().length !== 3) {
-					console.log('invalid cvv');
+					displayInputError(document.querySelector('#cvv'));
 				}
 			}
 		} else {
-			console.log('No payment option selected');
-			// highlight payment option select 
+			// no payment option selected
+			displayFieldsetError(document.querySelector('fieldset.payment-info legend'), 'Please select a payment option');
 		}
 
 	}

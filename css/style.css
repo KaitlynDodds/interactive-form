@@ -149,6 +149,19 @@ button:hover {
   clear: both;
 }
 
+.error {
+	font-size: 1em;
+	color: #88292F;
+}
+
+.sm-error {
+	font-size: .8em;
+}
+
+.br-error {
+	border-color: #88292F;
+}
+
 /* ================================= 
   Media Queries
 ==================================== */

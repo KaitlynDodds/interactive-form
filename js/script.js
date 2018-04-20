@@ -7,7 +7,7 @@ const emailInput = document.getElementById('mail');
 const otherTitleInput = document.getElementById('other-title');
 
 const colorSelect = document.getElementById('color');
-
+const activitiesFieldset = document.querySelector('.activities');
 const paymentSelect = document.getElementById('payment');
 
 const creditCardPaymentDiv = document.getElementById('credit-card');
@@ -106,37 +106,37 @@ document.getElementById('design').addEventListener('change', (e) => {
 /* Register for Activities
 ***************************/ 
 
-document.querySelector('.activities').addEventListener('change', (e) => {
+activitiesFieldset.addEventListener('change', (e) => {
 
-	function toggleConflictingEvents(label, conflict) {
-		const labels = document.querySelector('.activities').querySelectorAll('label');
-		// loop over all activity labels 
+	// enables and disables conflicting activities 
+	function toggleConflictingEvents(deselectedLabel, conflict) {
+
+		const labels = activitiesFieldset.querySelectorAll('label');
 		for (let i = 0; i < labels.length; i++) {
 
 			// isolate timeslot for activity
-			const timeslot = labels[i].querySelector('.timeslot');
+			const currentLabel = labels[i];
+			const timeslot = currentLabel.querySelector('.timeslot');
 
 			// check if timeslot is the same as conflict
 			if (timeslot && 
-				labels[i] !== label &&
-				timeslot.textContent.trim() === conflict ) {
+				currentLabel !== deselectedLabel &&
+				timeslot.textContent.trim() === conflict 
+				) {
 				// check if timeslot is already disabled 
-				if (labels[i].classList.contains('disabled')) {
+				if (currentLabel.classList.contains('disabled')) {
 					// enable checkbox
-					labels[i].querySelector('input').disabled = false;
-					labels[i].classList.remove('disabled');
+					currentLabel.querySelector('input').disabled = false;
+					currentLabel.classList.remove('disabled');
 				} else {
 					// disable conflicting label
-					labels[i].querySelector('input').disabled = true;
-					labels[i].className = 'disabled';
+					currentLabel.querySelector('input').disabled = true;
+					currentLabel.className = 'disabled';
 				}
 			} 
 		}
 	}
 
-	
-
-	
 	if (e.target.type === 'checkbox') {
 		const label = e.target.parentNode;	
 		const activities = registration.activities.activities;
@@ -144,6 +144,7 @@ document.querySelector('.activities').addEventListener('change', (e) => {
 		const price = label.querySelector('.price');
 		const timeslot = label.querySelector('.timeslot');
 		const activity = (label.textContent.split(' — '))[0].trim();
+
 		// event info object
 		const eventObj = {
 			time: (timeslot ? timeslot.textContent : null),
@@ -165,12 +166,15 @@ document.querySelector('.activities').addEventListener('change', (e) => {
 			// remove event info from activities arr 
 			for (let i = 0; i < activities.length; i++) {
 				if (eventObj.activity === activities[i].activity && 
-					eventObj.time === activities[i].time)
+					eventObj.time === activities[i].time
+					) {
+					
 					// events match, remove from activities arr
 					activities.splice(i, 1);
 
 					// remove disabled styling from all related events 
 					toggleConflictingEvents(label, eventObj.time);
+				}
 			}
 		}
 
@@ -183,9 +187,23 @@ document.querySelector('.activities').addEventListener('change', (e) => {
 
 // hide all payment options 
 function hideAllPaymentOptions() {
-	creditCardPaymentDiv.style.display = 'none';
-	paypalPaymentDiv.style.display = 'none';
-	bitcoinPaymentDiv.style.display = 'none';
+	hide(creditCardPaymentDiv);
+	hide(paypalPaymentDiv);
+	hide(bitcoinPaymentDiv);
+}
+
+function setPaymentType(paymentType) {
+	registration.payment = {
+		type: paymentType
+	}
+}
+
+function hide(element) {
+	element.style.display = 'none';
+}
+
+function show(element) {
+	element.style.display = '';
 }
 
 //respond to change events on payment options select
@@ -195,34 +213,28 @@ paymentSelect.addEventListener('change', (e) => {
 		// hide all payment divs
 		hideAllPaymentOptions();
 		// show credit card payment div
-		creditCardPaymentDiv.style.display = '';
+		show(creditCardPaymentDiv);
 		// record payment type
 		registration.payment = creditCardPaymentObj;
 	} else if (e.target.value === 'paypal') {
 		// hide all payment divs
 		hideAllPaymentOptions();
 		// show paypal payment div
-		paypalPaymentDiv.style.display = '';
+		show(paypalPaymentDiv);
 		// record payment type
-		registration.payment = {
-			type: e.target.value
-		}		
+		setPaymentType(e.target.value);		
 	} else if (e.target.value === 'bitcoin') {
 		// hide all payment divs
 		hideAllPaymentOptions();
 		// show bitcoin payment div
-		bitcoinPaymentDiv.style.display = '';
+		show(bitcoinPaymentDiv);
 		// record payment type
-		registration.payment = {
-			type: e.target.value
-		}
+		setPaymentType(e.target.value);
 	} else {
 		// hide all payment divs
 		hideAllPaymentOptions();
 		// record payment type
-		registration.payment = {
-			type: e.target.value
-		}
+		setPaymentType(e.target.value);
 	}
 
 
@@ -316,10 +328,8 @@ document.querySelector('button').addEventListener('click', (e) => {
 			if (registration.payment.type === 'credit card') {
 				
 				// Credit card field should only accept a number between 13 and 16 digits
-				if (registration.payment.cardNumber().length >= 13 && 
-					registration.payment.cardNumber().length <= 16) {
-					// FIXME: make this easier to understand
-				} else {
+				if (!(registration.payment.cardNumber().length >= 13 && 
+					registration.payment.cardNumber().length <= 16)) {
 					displayInputError(document.querySelector('#cc-num'));
 				}
 

@@ -25,6 +25,13 @@ const registration = {
 	}
 };
 
+const creditCardPaymentObj = {
+	type: 'credit card',
+	cardNumber: () => { return document.querySelector('#cc-num').value },
+	zipCode: () => { return document.querySelector('#zip').value },
+	cvv: () => { return document.querySelector('#cvv').value }
+}
+
 
 /* Page Setup
 ******************/ 
@@ -39,6 +46,7 @@ otherTitleInput.style.display = 'none';
 paymentSelect.value = 'credit card';
 hideAllPaymentOptions();
 creditCardPaymentDiv.style.display = '';
+registration.payment = creditCardPaymentObj;
 
 
 /* Job Role 
@@ -180,24 +188,98 @@ paymentSelect.addEventListener('change', (e) => {
 		hideAllPaymentOptions();
 		// show credit card payment div
 		creditCardPaymentDiv.style.display = '';
+		// record payment type
+		registration.payment = creditCardPaymentObj;
 	} else if (e.target.value === 'paypal') {
 		// hide all payment divs
 		hideAllPaymentOptions();
 		// show paypal payment div
-		paypalPaymentDiv.style.display = '';		
+		paypalPaymentDiv.style.display = '';
+		// record payment type
+		registration.payment = {
+			type: e.target.value
+		}		
 	} else if (e.target.value === 'bitcoin') {
 		// hide all payment divs
 		hideAllPaymentOptions();
 		// show bitcoin payment div
 		bitcoinPaymentDiv.style.display = '';
+		// record payment type
+		registration.payment = {
+			type: e.target.value
+		}
 	} else {
 		// hide all payment divs
 		hideAllPaymentOptions();
+		// record payment type
+		registration.payment = {
+			type: e.target.value
+		}
 	}
+
 
 });
 
 
+/* Form Validation
+**********************/ 
+
+function isEmail(email) {
+	// check for precense of '@'
+	var re = /\S+@\S+/;
+    return re.test(email);
+}
+
+document.querySelector('button').addEventListener('click', (e) => {
+	// stop page reload
+	e.preventDefault();
+
+	if (e.target.type === 'submit') {
+		
+		// Name field can't be blank
+		if (registration.name().length === 0) {
+			console.log('name is blank');
+		}
+
+		// Email field must be a validly formatted e-mail address (you don't have to check that it's a real e-mail address, just that it's formatted like one: dave@teamtreehouse.com for example.
+		if (!isEmail(registration.email())) {
+			console.log('Invalid email');
+		}
+
+		// Must select at least one checkbox under the "Register for Activities" section of the form.
+		if (registration.activities.activities.length === 0) {
+			console.log('Please select an activity.');
+		}
+
+		if (registration.payment.type !== 'select_method') {
+			// If the selected payment option is "Credit Card," make sure the user has supplied a credit card number, a zip code, and a 3 number CVV value before the form can be submitted.
+			if (registration.payment.type === 'credit card') {
+				// Credit card field should only accept a number between 13 and 16 digits
+				if (registration.payment.cardNumber().length >= 13 && 
+					registration.payment.cardNumber().length <= 16) {
+					console.log('Credit card number is valid');
+				} else {
+					console.log('Credit card number is invalid');
+				}
+
+				// The zipcode field should accept a 5-digit number
+				if (registration.payment.zipCode().length !== 5) {
+					console.log('zip code is invalid');
+				}
+
+				// The CVV should only accept a number that is exactly 3 digits long
+				if (registration.payment.cvv().length !== 3) {
+					console.log('invalid cvv');
+				}
+			}
+		} else {
+			console.log('No payment option selected');
+			// highlight payment option select 
+		}
+
+	}
+
+});
 
 
 

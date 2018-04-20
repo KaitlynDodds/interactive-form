@@ -112,26 +112,29 @@ document.querySelector('.activities').addEventListener('change', (e) => {
 		const labels = document.querySelector('.activities').querySelectorAll('label');
 		// loop over all activity labels 
 		for (let i = 0; i < labels.length; i++) {
+
 			// isolate timeslot for activity
-			const labelTimeslot = labels[i].querySelector('.timeslot');
+			const timeslot = labels[i].querySelector('.timeslot');
+
 			// check if timeslot is the same as conflict
-			if (labelTimeslot && 
-				labelTimeslot.textContent.trim() === conflict) {
-				// timeslot conflicts
-				console.log(labels[i].querySelector('input').disabled);
-				if (labels[i] !== label) {
-					// disable checkbox
-					labels[i].querySelector('input').disabled = true;
-					labels[i].style.color = "lightgrey";
-				} else {
-					// enabled checkbox
+			if (timeslot && 
+				labels[i] !== label &&
+				timeslot.textContent.trim() === conflict ) {
+				// check if timeslot is already disabled 
+				if (labels[i].classList.contains('disabled')) {
+					// enable checkbox
 					labels[i].querySelector('input').disabled = false;
-					labels[i].style.color = 'red';	
+					labels[i].classList.remove('disabled');
+				} else {
+					// disable conflicting label
+					labels[i].querySelector('input').disabled = true;
+					labels[i].className = 'disabled';
 				}
-				
 			} 
 		}
 	}
+
+	
 
 	
 	if (e.target.type === 'checkbox') {
@@ -167,7 +170,7 @@ document.querySelector('.activities').addEventListener('change', (e) => {
 					activities.splice(i, 1);
 
 					// remove disabled styling from all related events 
-					toggleConflictingEvents(label, eventObj.timeslot);
+					toggleConflictingEvents(label, eventObj.time);
 			}
 		}
 

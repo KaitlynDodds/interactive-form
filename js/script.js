@@ -50,8 +50,8 @@ document.getElementById('name').focus();
 otherTitleInput.style.display = 'none';
 
 // select credit card payment by default 
-paymentSelect.value = 'credit card';
 hideAllPaymentOptions();
+paymentSelect.value = 'credit card';
 creditCardPaymentDiv.style.display = '';
 registration.payment = creditCardPaymentObj;
 
@@ -170,8 +170,6 @@ document.querySelector('.activities').addEventListener('change', (e) => {
 					toggleConflictingEvents(label, eventObj.timeslot);
 			}
 		}
-
-		console.log(registration.activities.activities);
 
 	}
 });

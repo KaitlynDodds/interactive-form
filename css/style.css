@@ -166,6 +166,33 @@ button:hover {
 	color: #878E88;
 }
 
+.error-list {
+	color: #88292F;
+	font-weight: bold;
+	font-size: 1em;
+}
+
+.error-list ul {
+	list-style: none;
+	margin: 20px 30px;
+	padding: 0;
+}
+
+.error-list li::before {
+	content: "";
+	width: 6px;
+	height: 6px;
+	margin-right: 6px;
+	margin-bottom: .13em;
+	display: inline-block;
+	border-radius: 100%;
+	background-color: #88292F;
+}
+
+.error-list li {
+	margin: 15px 0;
+}
+
 /* ================================= 
   Media Queries
 ==================================== */

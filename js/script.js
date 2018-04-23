@@ -12,6 +12,9 @@ const activitiesFieldset = document.querySelector('.activities');
 const paymentSelect = document.getElementById('payment');
 
 const creditCardPaymentDiv = document.getElementById('credit-card');
+const ccNumInput = document.querySelector('#cc-num');
+const zipInput = document.querySelector('#zip');
+const cvvInput = document.querySelector('#cvv');
 const paypalPaymentDiv = creditCardPaymentDiv.nextElementSibling;
 const bitcoinPaymentDiv = paypalPaymentDiv.nextElementSibling;
 
@@ -36,9 +39,9 @@ const registration = {
 
 const creditCardPaymentObj = {
 	type: 'credit card',
-	cardNumber: () => { return document.querySelector('#cc-num').value },
-	zipCode: () => { return document.querySelector('#zip').value },
-	cvv: () => { return document.querySelector('#cvv').value }
+	cardNumber: () => { return ccNumInput.value },
+	zipCode: () => { return zipInput.value },
+	cvv: () => { return cvvInput.value }
 }
 
 
@@ -279,7 +282,9 @@ function removeInputError(input, msg = '') {
 	label.classList.remove('error');
 
 	const span = label.querySelector('span');
-	label.removeChild(span);
+	if (span) {
+		label.removeChild(span);
+	}
 }
 
 // add error styling to fieldset legend
@@ -289,7 +294,9 @@ function displayFieldsetError(legend, errMsg) {
 
 function removeFieldsetError(legend) {
 	const spanError = legend.querySelector('span');
-	legend.removeChild(spanError);
+	if (spanError) {
+		legend.removeChild(spanError);
+	}
 }
 
 function removeAllErrorStyling() {
@@ -334,6 +341,75 @@ function removeErrorMessages() {
 	}
 }
 
+function checkNameInput() {
+	if (registration.name().length === 0) {
+		// display error
+		displayInputError(nameInput, '(please provide a name)');
+		return 'Please provide a name.';
+	} else {
+		// remove error 
+		removeInputError(nameInput);
+		return null;
+	}
+}
+
+function checkEmailInput() {
+	if (registration.email().length === 0) {
+		displayInputError(emailInput, '(please provide an email address)');
+		return 'Please provide an email address.';
+	}
+	else if (!isEmail(registration.email())) {
+		displayInputError(emailInput, '(please provide a valid email address)');
+		return 'Please provide a valid email address.';
+	} else {
+		removeInputError(emailInput);
+		return null;
+	}
+}
+
+function checkCreditCardNumber() {
+	if (registration.payment.cardNumber().length === 0) {
+		displayInputError(ccNumInput);
+		return 'Please enter a credit card number.';
+	}
+	else if (!(registration.payment.cardNumber().length >= 13 && 
+			registration.payment.cardNumber().length <= 16)) {
+		displayInputError(ccNumInput);
+		return 'Please enter a credit card number that is between 13 and 16 digits long.';
+	} else {
+		removeInputError(ccNumInput);
+		return null;
+	}
+}
+
+function checkZipcodeInput() {
+	if (registration.payment.zipCode().length === 0) {
+		displayInputError(zipInput);
+		return 'Please provide a zipcode.';
+	}
+	else if (registration.payment.zipCode().length !== 5) {
+		displayInputError(zipInput);
+		return 'Zipcode must be 5 digits';
+	} else {
+		removeInputError(zipInput);
+		return null;
+	}
+}
+
+function checkCVVInput() {
+	if (registration.payment.cvv().length === 0) {
+		displayInputError(cvvInput);
+		return 'Please provide a cvv.';
+	}
+	else if (registration.payment.cvv().length !== 3) {
+		displayInputError(cvvInput);
+		return 'CVV must be 3 digits';
+	} else {
+		removeInputError(cvvInput);
+		return null;
+	}
+}
+
 registerBtn.addEventListener('click', (e) => {
 	// stop page reload
 	e.preventDefault();
@@ -343,22 +419,15 @@ registerBtn.addEventListener('click', (e) => {
 		removeAllErrorStyling();
 		removeErrorMessages();
 		const errorMsgs = [];
+		let error;
 		
 		// Name field can't be blank
-		if (registration.name().length === 0) {
-			displayInputError(nameInput, '(please provide a name)');
-			errorMsgs.push('Please provide a name');
-		}
-
+		error = checkNameInput();
+		if (error) { errorMsgs.push(error); }
+		
 		// Email field must be a validly formatted e-mail address (you don't have to check that it's a real e-mail address, just that it's formatted like one: dave@teamtreehouse.com for example.
-		if (registration.email().length === 0) {
-			displayInputError(emailInput, '(please provide an email address)');
-			errorMsgs.push('Please provide an email address.');
-		}
-		else if (!isEmail(registration.email())) {
-			displayInputError(emailInput, '(please provide a valid email address)');
-			errorMsgs.push('Please provide a valid email address.');
-		}
+		error = checkEmailInput();
+		if (error) { errorMsgs.push(error); }
 
 		// t-shirt theme must be selected 
 		if (registration.tshirt.design() === 'Select Theme') {
@@ -377,35 +446,17 @@ registerBtn.addEventListener('click', (e) => {
 			if (registration.payment.type === 'credit card') {
 				
 				// Credit card field should only accept a number between 13 and 16 digits
-				if (registration.payment.cardNumber().length === 0) {
-					displayInputError(document.querySelector('#cc-num'));
-					errorMsgs.push('Please enter a credit card number.');
-				}
-				else if (!(registration.payment.cardNumber().length >= 13 && 
-					registration.payment.cardNumber().length <= 16)) {
-					displayInputError(document.querySelector('#cc-num'));
-					errorMsgs.push('Please enter a credit card number that is between 13 and 16 digits long.');
-				}
+				error = checkCreditCardNumber();
+				if (error) { errorMsgs.push(error); }
 
 				// The zipcode field should accept a 5-digit number
-				if (registration.payment.zipCode().length === 0) {
-					displayInputError(document.querySelector('#zip'));
-					errorMsgs.push('Please provide a zipcode.');
-				}
-				else if (registration.payment.zipCode().length !== 5) {
-					displayInputError(document.querySelector('#zip'));
-					errorMsgs.push('Zipcode must be 5 digits');
-				}
+				error = checkZipcodeInput();
+				if (error) { errorMsgs.push(error); }
 
 				// The CVV should only accept a number that is exactly 3 digits long
-				if (registration.payment.cvv().length === 0) {
-					displayInputError(document.querySelector('#cvv'));
-					errorMsgs.push('Please provide a cvv.');
-				}
-				else if (registration.payment.cvv().length !== 3) {
-					displayInputError(document.querySelector('#cvv'));
-					errorMsgs.push('CVV must be 3 digits');
-				}
+				error = checkCVVInput();
+				if (error) { errorMsgs.push(error); }
+				
 			}
 		} else {
 			// no payment option selected
@@ -419,6 +470,26 @@ registerBtn.addEventListener('click', (e) => {
 
 });
 
+nameInput.addEventListener('input', (e) => {
+	// Name field can't be blank
+	checkNameInput();
+});
+
+emailInput.addEventListener('input', (e) => {
+	checkEmailInput();
+});
+
+ccNumInput.addEventListener('input', (e) => {
+	checkCreditCardNumber();
+});
+
+zipInput.addEventListener('input', (e) => {
+	checkZipcodeInput();
+});
+
+cvvInput.addEventListener('input', (e) => {
+	checkCVVInput();
+});
 
 
 

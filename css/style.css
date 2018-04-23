@@ -162,6 +162,10 @@ button:hover {
 	border-color: #88292F;
 }
 
+input.br-error:focus {
+	border-color: #88292F;
+}
+
 .disabled {
 	color: #878E88;
 }

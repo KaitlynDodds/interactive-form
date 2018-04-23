@@ -9,7 +9,7 @@ const otherTitleInput = document.getElementById('other-title');
 const themeSelect = document.getElementById('design');
 const colorSelectDiv = document.getElementById('colors-js-puns');
 const colorSelect = document.getElementById('color');
-const activitiesFieldset = document.querySelector('.activities');
+const activitiesFieldset = document.querySelector('fieldset.activities');
 
 
 const creditCardPaymentDiv = document.getElementById('credit-card');
@@ -136,6 +136,22 @@ themeSelect.addEventListener('change', (e) => {
 /* Register for Activities
 ***************************/ 
 
+function updatePrice() {
+	const total = registration.activities.total;
+	const totalElem = activitiesFieldset.querySelector('.total');
+	
+	if (activitiesFieldset.querySelector('.total')) {
+		// total element already exists, update total
+		totalElem.textContent = `Total: $${total}`;
+	} else {
+		const newTotalElem = document.createElement('p');
+		newTotalElem.className = 'total';
+		newTotalElem.textContent = `Total: $${total}`;
+		activitiesFieldset.appendChild(newTotalElem);
+	}
+
+}
+
 activitiesFieldset.addEventListener('change', (e) => {
 
 	// enables and disables conflicting activities 
@@ -187,6 +203,9 @@ activitiesFieldset.addEventListener('change', (e) => {
 			// add event info to activities arr 
 			activities.push(eventObj);
 
+			// update total 
+			registration.activities.total += eventObj.price;
+
 			// disable conflicting events 
 			if (timeslot) {
 				toggleConflictingEvents(label, timeslot.textContent.trim());
@@ -198,6 +217,9 @@ activitiesFieldset.addEventListener('change', (e) => {
 				if (eventObj.activity === activities[i].activity && 
 					eventObj.time === activities[i].time
 					) {
+
+					// update total 
+					registration.activities.total -= activities[i].price;
 					
 					// events match, remove from activities arr
 					activities.splice(i, 1);
@@ -207,6 +229,9 @@ activitiesFieldset.addEventListener('change', (e) => {
 				}
 			}
 		}
+
+		// update total price
+		updatePrice();
 
 		// check for errors 
 		checkActivities();

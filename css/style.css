@@ -149,6 +149,10 @@ button:hover {
   clear: both;
 }
 
+.total {
+	font-weight: bold;
+}
+
 .error {
 	font-size: 1em;
 	color: #88292F;

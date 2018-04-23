@@ -63,6 +63,7 @@ show(creditCardPaymentDiv);
 registration.payment = creditCardPaymentObj;
 
 // hide color label and select 
+colorSelect.innerHTML = '<option>Please select a T-shirt theme</option>';
 hide(colorSelectDiv);
 
 
@@ -196,7 +197,6 @@ activitiesFieldset.addEventListener('change', (e) => {
 			price: parseInt(label.textContent.split(/[$]+/)[1].trim()),
 			event: label.textContent.split(/[—,$]+/)[0].trim()
 		}
-		
 
 		if (e.target.checked) {
 			// add event info to activities arr 
@@ -299,7 +299,7 @@ paymentSelect.addEventListener('change', (e) => {
 
 function isEmail(email) {
 	// check for precense of '@'
-	var re = /\S+@\S+/;
+	var re = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/
     return re.test(email);
 }
 
@@ -560,7 +560,8 @@ Form Submit Error Checking  ***/
 
 registerBtn.addEventListener('click', (e) => {
 	// stop page reload
-	e.preventDefault();
+	// e.preventDefault();
+	console.log('here');
 
 	if (e.target.type === 'submit') {
 		// remove any error styling that already exists
@@ -611,7 +612,11 @@ registerBtn.addEventListener('click', (e) => {
 		}
 
 		// show new error messages
-		displayErrorMessages(errorMsgs);
+		if (errorMsgs.length > 0) {
+			e.preventDefault();
+			displayErrorMessages(errorMsgs);	
+		}
+		
 	}
 });
 

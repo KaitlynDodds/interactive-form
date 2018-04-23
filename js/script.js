@@ -1,5 +1,5 @@
 
-/* Const Elements
+/* Page Elements
 ******************/ 
 const nameInput = document.getElementById('name');
 const emailInput = document.getElementById('mail');
@@ -22,6 +22,11 @@ const bitcoinPaymentDiv = paypalPaymentDiv.nextElementSibling;
 
 const registerBtn = document.querySelector('button');
 
+
+/* Registration Object
+************************/ 
+
+// track/access elements/values throughout the form 
 const registration = {
 	name: () => { return nameInput.value },
 	email: () => { return emailInput.value },
@@ -39,6 +44,7 @@ const registration = {
 	}
 };
 
+// track/access elements/values related to credit card payment option
 const creditCardPaymentObj = {
 	type: 'credit card',
 	cardNumber: () => { return ccNumInput.value },
@@ -85,10 +91,9 @@ function show(element) {
 // when 'other' job role selected, show other_title input
 document.getElementById('title').addEventListener('change', (e) => {
 	if (e.target.value === 'other') {
-		otherTitleInput.style.display = '';
+		hide(otherTitleInput);
 	} else {
-		// ensure other_title input is hidden
-		otherTitleInput.style.display = 'none';
+		show(otherTitleInput);
 	}
 });
 
@@ -99,13 +104,13 @@ document.getElementById('title').addEventListener('change', (e) => {
 // alter visible color options based on selected theme
 themeSelect.addEventListener('change', (e) => {
 	// check for errors
-	checkTShirtTheme();
+	checkTShirtThemeErrors();
 
 	const theme = e.target.value;
 
 	// clear all options from colorSelect
 	colorSelect.innerHTML = '';
-
+	// colors to use for each theme option 
 	const jsPunsColors = ['Cornflower Blue', 'Dark Slate Grey', 'Gold'];
 	const heartJSColors = ['Tomato', 'Steel Blue', 'Dim Grey'];
 
@@ -148,6 +153,7 @@ function updatePrice() {
 		// total element already exists, update total
 		totalElem.textContent = `Total: $${total}`;
 	} else {
+		// create new total element, append to fieldset
 		const newTotalElem = document.createElement('p');
 		newTotalElem.className = 'total';
 		newTotalElem.textContent = `Total: $${total}`;
@@ -156,6 +162,7 @@ function updatePrice() {
 
 }
 
+// when user selects an activity 
 activitiesFieldset.addEventListener('change', (e) => {
 
 	// enables and disables conflicting activities 
@@ -189,9 +196,9 @@ activitiesFieldset.addEventListener('change', (e) => {
 
 	if (e.target.type === 'checkbox') {
 		const label = e.target.parentNode;	
-		const activities = registration.activities.activities;
+		const activitiesObj = registration.activities.activities;
 
-		// event info object
+		// parse event info from activity label 
 		const eventObj = {
 			time: label.textContent.split(/[—,$]+/)[1].trim(),
 			price: parseInt(label.textContent.split(/[$]+/)[1].trim()),
@@ -200,7 +207,7 @@ activitiesFieldset.addEventListener('change', (e) => {
 
 		if (e.target.checked) {
 			// add event info to activities arr 
-			activities.push(eventObj);
+			activitiesObj.push(eventObj);
 
 			// update total 
 			registration.activities.total += eventObj.price;
@@ -212,16 +219,16 @@ activitiesFieldset.addEventListener('change', (e) => {
 
 		} else {
 			// remove event info from activities arr 
-			for (let i = 0; i < activities.length; i++) {
-				if (eventObj.activity === activities[i].activity && 
-					eventObj.time === activities[i].time
+			for (let i = 0; i < activitiesObj.length; i++) {
+				if (eventObj.activity === activitiesObj[i].activity && 
+					eventObj.time === activitiesObj[i].time
 					) {
 
 					// update total 
-					registration.activities.total -= activities[i].price;
+					registration.activitiesObj.total -= activitiesObj[i].price;
 					
 					// events match, remove from activities arr
-					activities.splice(i, 1);
+					activitiesObj.splice(i, 1);
 
 					// remove disabled styling from all related events 
 					toggleConflictingEvents(label, eventObj.time);
@@ -233,7 +240,7 @@ activitiesFieldset.addEventListener('change', (e) => {
 		updatePrice();
 
 		// check for errors 
-		checkActivities();
+		checkActivityErrors();
 
 	}
 });
@@ -297,8 +304,9 @@ paymentSelect.addEventListener('change', (e) => {
 /* Form Validation
 **********************/ 
 
+// regex to assess email validity
 function isEmail(email) {
-	// check for precense of '@'
+	// check for valid email
 	var re = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/
     return re.test(email);
 }
@@ -354,14 +362,14 @@ function removeAllErrorStyling() {
 			removeInputError(input);
 		} else if (errorElements[i].tagName === 'SPAN') {
 			// remove fieldset error styling
-			const parent = errorElements[i].parentNode;
-			removeFieldsetError(parent);
+			const legend = errorElements[i].parentNode;
+			removeFieldsetError(legend);
 		}
 	}
 }
 
 // displays detailed error messages below registration form
-function displayErrorMessages(errorMsgs) {
+function displayErrorMessageDiv(errorMsgs) {
 	const errorMessageDiv = document.createElement('div');
 	errorMessageDiv.className = 'error-list';
 	const errorMessageUL = document.createElement('ul');
@@ -391,7 +399,7 @@ function removeErrorMessageDiv() {
 Error Checking Functions  ***/
 
 // check for errors on name input
-function checkNameInput() {
+function checkNameInputErrors() {
 	if (registration.name().length === 0) {
 		// display error
 		displayInputError(nameInput, '(please provide a name)');
@@ -405,7 +413,7 @@ function checkNameInput() {
 }
 
 // check for error on email input
-function checkEmailInput() {
+function checkEmailInputErrors() {
 	if (registration.email().length === 0) {
 		// remove any error formatting that already exists
 		removeInputError(emailInput);
@@ -429,7 +437,7 @@ function checkEmailInput() {
 }
 
 // check credit card number input errors 
-function checkCreditCardNumber() {
+function checkCreditCardNumberErrors() {
 	if (registration.payment.cardNumber().length === 0) {
 		// remove any error formatting that already exists
 		removeInputError(ccNumInput);
@@ -455,7 +463,7 @@ function checkCreditCardNumber() {
 }
 
 // check zipcode input errors
-function checkZipcodeInput() {
+function checkZipcodeInputErrors() {
 	if (registration.payment.zipCode().length === 0) {
 		// remove any error formatting that already exists
 		removeInputError(zipInput);
@@ -479,7 +487,7 @@ function checkZipcodeInput() {
 }
 
 // check cvv input errors
-function checkCVVInput() {
+function checkCVVInputErrors() {
 	if (registration.payment.cvv().length === 0) {
 		// remove any error formatting that already exists
 		removeInputError(cvvInput);
@@ -503,7 +511,7 @@ function checkCVVInput() {
 }
 
 // check that user has selected tshirt theme
-function checkTShirtTheme() {
+function checkTShirtThemeErrors() {
 	if (registration.tshirt.design() === 'Select Theme') {
 		// display error
 		displayFieldsetError(document.querySelector('fieldset.shirt legend'), 'Don\'t forget to pick a T-Shirt');
@@ -517,7 +525,7 @@ function checkTShirtTheme() {
 }
 
 // check user has select at least one activity
-function checkActivities() {
+function checkActivityErrors() {
 	if (registration.activities.activities.length === 0) {
 		// display error
 		displayFieldsetError(document.querySelector('fieldset.activities legend'), 'Please select an Activity');
@@ -535,23 +543,23 @@ function checkActivities() {
 Real Time Error Checking Event Listeners  ***/
 
 nameInput.addEventListener('input', (e) => {
-	checkNameInput();
+	checkNameInputErrors();
 });
 
 emailInput.addEventListener('input', (e) => {
-	checkEmailInput();
+	checkEmailInputErrors();
 });
 
 ccNumInput.addEventListener('input', (e) => {
-	checkCreditCardNumber();
+	checkCreditCardNumberErrors();
 });
 
 zipInput.addEventListener('input', (e) => {
-	checkZipcodeInput();
+	checkZipcodeInputErrors();
 });
 
 cvvInput.addEventListener('input', (e) => {
-	checkCVVInput();
+	checkCVVInputErrors();
 });
 
 
@@ -559,9 +567,6 @@ cvvInput.addEventListener('input', (e) => {
 Form Submit Error Checking  ***/
 
 registerBtn.addEventListener('click', (e) => {
-	// stop page reload
-	// e.preventDefault();
-	console.log('here');
 
 	if (e.target.type === 'submit') {
 		// remove any error styling that already exists
@@ -573,19 +578,19 @@ registerBtn.addEventListener('click', (e) => {
 		let error;
 		
 		// Name field can't be blank
-		error = checkNameInput();
+		error = checkNameInputErrors();
 		if (error) { errorMsgs.push(error); }
 		
 		// Email field must be a validly formatted e-mail address (you don't have to check that it's a real e-mail address, just that it's formatted like one: dave@teamtreehouse.com for example.
-		error = checkEmailInput();
+		error = checkEmailInputErrors();
 		if (error) { errorMsgs.push(error); }
 
 		// t-shirt theme must be selected 
-		error = checkTShirtTheme();
+		error = checkTShirtThemeErrors();
 		if (error) { errorMsgs.push(error); }
 
 		// Must select at least one checkbox under the "Register for Activities" section of the form.
-		error = checkActivities();
+		error = checkActivityErrors();
 		if (error) { errorMsgs.push(error); }
 
 		if (registration.payment.type !== 'select_method') {
@@ -593,15 +598,15 @@ registerBtn.addEventListener('click', (e) => {
 			if (registration.payment.type === 'credit card') {
 				
 				// Credit card field should only accept a number between 13 and 16 digits
-				error = checkCreditCardNumber();
+				error = checkCreditCardNumberErrors();
 				if (error) { errorMsgs.push(error); }
 
 				// The zipcode field should accept a 5-digit number
-				error = checkZipcodeInput();
+				error = checkZipcodeInputErrors();
 				if (error) { errorMsgs.push(error); }
 
 				// The CVV should only accept a number that is exactly 3 digits long
-				error = checkCVVInput();
+				error = checkCVVInputErrors();
 				if (error) { errorMsgs.push(error); }
 				
 			}
@@ -611,10 +616,10 @@ registerBtn.addEventListener('click', (e) => {
 			errorMsgs.push('Please select a payment option');
 		}
 
-		// show new error messages
+		// show new error messages, prevent form submission 
 		if (errorMsgs.length > 0) {
 			e.preventDefault();
-			displayErrorMessages(errorMsgs);	
+			displayErrorMessageDiv(errorMsgs);	
 		}
 		
 	}

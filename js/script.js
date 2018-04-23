@@ -101,18 +101,21 @@ themeSelect.addEventListener('change', (e) => {
 	checkTShirtTheme();
 
 	const theme = e.target.value;
-	const options = colorSelect.options;
-	const jsPunsColors = ['cornflowerblue', 'darkslategrey', 'gold'];
-	const heartJSColors = ['tomato', 'steelblue', 'dimgrey'];
 
-	function toggleVisibility(colors) {
-		for (let i = 0; i < options.length; i++) {
-			if (colors.indexOf(options[i].value) > -1) {
-				options[i].style.display = '';
-				colorSelect.value = options[i].value;
-			} else {
-				options[i].style.display = 'none';
-			}
+	// clear all options from colorSelect
+	colorSelect.innerHTML = '';
+
+	const jsPunsColors = ['Cornflower Blue', 'Dark Slate Grey', 'Gold'];
+	const heartJSColors = ['Tomato', 'Steel Blue', 'Dim Grey'];
+
+	function showColorOptions(colors) {
+		for (let i = 0; i < colors.length; i++) {
+			const color = document.createElement('option');
+			color.textContent = colors[i];
+			// remove all whitespace from color val 
+			color.value = colors[i].replace(/ /g,'').toLowerCase();
+			// add option to colorSelect
+			colorSelect.appendChild(color);
 		}
 	}
 
@@ -120,12 +123,12 @@ themeSelect.addEventListener('change', (e) => {
 		// show color menu
 		show(colorSelectDiv);
 		// display "Cornflower Blue," "Dark Slate Grey," and "Gold."
-		toggleVisibility(jsPunsColors);
+		showColorOptions(jsPunsColors);
 	} else if (theme === 'heart js') {
 		// show color menu
 		show(colorSelectDiv);
 		// display "Tomato," "Steel Blue," and "Dim Grey."
-		toggleVisibility(heartJSColors);
+		showColorOptions(heartJSColors);
 	} else {
 		hide(colorSelectDiv);
 	}
@@ -139,7 +142,7 @@ themeSelect.addEventListener('change', (e) => {
 function updatePrice() {
 	const total = registration.activities.total;
 	const totalElem = activitiesFieldset.querySelector('.total');
-	
+
 	if (activitiesFieldset.querySelector('.total')) {
 		// total element already exists, update total
 		totalElem.textContent = `Total: $${total}`;

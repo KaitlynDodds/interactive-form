@@ -165,12 +165,12 @@ activitiesFieldset.addEventListener('change', (e) => {
 
 			// isolate timeslot for activity
 			const currentLabel = labels[i];
-			const timeslot = currentLabel.querySelector('.timeslot');
+			const timeslot = currentLabel.textContent.split(/[—,$]+/)[1].trim();
 
 			// check if timeslot is the same as conflict
 			if (timeslot && 
 				currentLabel !== deselectedLabel &&
-				timeslot.textContent.trim() === conflict 
+				timeslot === conflict 
 				) {
 				// check if timeslot is already disabled 
 				if (currentLabel.classList.contains('disabled')) {
@@ -190,15 +190,11 @@ activitiesFieldset.addEventListener('change', (e) => {
 		const label = e.target.parentNode;	
 		const activities = registration.activities.activities;
 
-		const price = label.querySelector('.price');
-		const timeslot = label.querySelector('.timeslot');
-		const activity = (label.textContent.split(' — '))[0].trim();
-
 		// event info object
 		const eventObj = {
-			time: (timeslot ? timeslot.textContent : null),
-			price: (price ? parseInt(price.textContent) : null),
-			event: (activity ? activity : null)
+			time: label.textContent.split(/[—,$]+/)[1].trim(),
+			price: parseInt(label.textContent.split(/[$]+/)[1].trim()),
+			event: label.textContent.split(/[—,$]+/)[0].trim()
 		}
 		
 
@@ -210,8 +206,8 @@ activitiesFieldset.addEventListener('change', (e) => {
 			registration.activities.total += eventObj.price;
 
 			// disable conflicting events 
-			if (timeslot) {
-				toggleConflictingEvents(label, timeslot.textContent.trim());
+			if (eventObj.time) {
+				toggleConflictingEvents(label, eventObj.time);
 			}
 
 		} else {

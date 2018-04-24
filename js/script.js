@@ -225,7 +225,6 @@ activitiesFieldset.addEventListener('change', (e) => {
 					) {
 
 					// update total 
-					console.log(activitiesObj[i].price);
 					registration.activities.total -= activitiesObj[i].price;
 					
 					// events match, remove from activities arr

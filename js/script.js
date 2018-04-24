@@ -91,9 +91,9 @@ function show(element) {
 // when 'other' job role selected, show other_title input
 document.getElementById('title').addEventListener('change', (e) => {
 	if (e.target.value === 'other') {
-		hide(otherTitleInput);
-	} else {
 		show(otherTitleInput);
+	} else {
+		hide(otherTitleInput);
 	}
 });
 
@@ -225,7 +225,8 @@ activitiesFieldset.addEventListener('change', (e) => {
 					) {
 
 					// update total 
-					registration.activitiesObj.total -= activitiesObj[i].price;
+					console.log(activitiesObj[i].price);
+					registration.activities.total -= activitiesObj[i].price;
 					
 					// events match, remove from activities arr
 					activitiesObj.splice(i, 1);

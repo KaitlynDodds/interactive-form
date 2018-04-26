@@ -122,5 +122,5 @@ complete and correctly formatted email address. Please accomplish this will your
 JavaScript code. Do not rely on HTML5's built-in email validation.  
 
 
-**Completed:** 4/22/2018 
+**Completed:** 4/22/2018   
 **Grade:** Exceeds Expectations
